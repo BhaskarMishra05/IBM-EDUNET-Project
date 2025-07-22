@@ -1,4 +1,5 @@
 # 🧠 Employee Salary Prediction
+![add](https://miro.medium.com/v2/resize:fit:958/1*16Phh8aWiSgmRilT9o-5Xw.jpeg)
 
 ## 📌 Project Description
 
@@ -9,6 +10,12 @@ The workflow is divided into three main stages:
 2. **Exploratory Data Analysis (EDA)** – Identifying key patterns, trends, and correlations in the data.
 3. **Model Building & Prediction** – Using machine learning algorithms to train and evaluate a regression model. The final output includes predictions compared with actual salaries.
 
+```mermaid
+flowchart TD
+    A[WORKFLOW] --> B[Data Loading & Cleaning]
+    A --> C[Exploratory Data Analysis]
+    A --> D[Model Building & Prediction]
+```
 ---
 
 ## 📊 Dataset
