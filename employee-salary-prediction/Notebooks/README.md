@@ -35,7 +35,6 @@ flowchart TD
     D1 --> D1a[Remove Whitespace, Drop Columns, Map Features]
     D --> D2[Baseline Linear Regression Model]
     D --> D3[KMeans Clustering + Regression Model]
-    D --> D4[Save Final Predictions]
 ```
 
 ---
