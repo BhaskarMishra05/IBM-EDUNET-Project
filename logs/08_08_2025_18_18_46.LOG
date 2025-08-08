@@ -1,7 +1,0 @@
-[2025-08-08 18:18:46,325] 21 - INFO - Making a directory for storing files
-[2025-08-08 18:18:46,325] 23 - INFO - loading raw csv file
-[2025-08-08 18:18:46,567] 25 - INFO - Successfully loaded the dataset
-[2025-08-08 18:18:46,567] 26 - INFO - Splitting the dataset into train and test datasets
-[2025-08-08 18:18:46,642] 28 - INFO - Successfully splitted the dataset
-[2025-08-08 18:18:46,642] 29 - INFO - Converting the datasets back into individual csv files
-[2025-08-08 18:18:47,123] 32 - INFO - Data Ingestion Completed Successfully

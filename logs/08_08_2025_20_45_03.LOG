@@ -1,4 +1,0 @@
-[2025-08-08 20:45:03,532] 342 - DEBUG - matplotlib data path: /home/bhaskar/Here_we_go_again/VS_code_ting/IBM-EDUNET-Project/venv/lib/python3.12/site-packages/matplotlib/mpl-data
-[2025-08-08 20:45:03,538] 342 - DEBUG - CONFIGDIR=/home/bhaskar/.config/matplotlib
-[2025-08-08 20:45:03,540] 1560 - DEBUG - interactive is False
-[2025-08-08 20:45:03,540] 1561 - DEBUG - platform is linux
