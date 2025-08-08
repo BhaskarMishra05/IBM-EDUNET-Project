@@ -1,0 +1,16 @@
+[2025-08-08 20:50:14,810] 342 - DEBUG - matplotlib data path: /home/bhaskar/Here_we_go_again/VS_code_ting/IBM-EDUNET-Project/venv/lib/python3.12/site-packages/matplotlib/mpl-data
+[2025-08-08 20:50:14,819] 342 - DEBUG - CONFIGDIR=/home/bhaskar/.config/matplotlib
+[2025-08-08 20:50:14,820] 1560 - DEBUG - interactive is False
+[2025-08-08 20:50:14,820] 1561 - DEBUG - platform is linux
+[2025-08-08 20:50:14,868] 21 - INFO - Making a directory for storing files
+[2025-08-08 20:50:14,868] 23 - INFO - loading raw csv file
+[2025-08-08 20:50:15,071] 25 - INFO - Successfully loaded the dataset
+[2025-08-08 20:50:15,071] 26 - INFO - Splitting the dataset into train and test datasets
+[2025-08-08 20:50:15,105] 28 - INFO - Successfully splitted the dataset
+[2025-08-08 20:50:15,105] 29 - INFO - Converting the datasets back into individual csv files
+[2025-08-08 20:50:15,697] 32 - INFO - Data Ingestion Completed Successfully
+[2025-08-08 20:50:18,032] 28 - INFO - Model training initiated with clustering
+[2025-08-08 20:50:18,497] 52 - INFO - Training cluster 0 model...
+[2025-08-08 20:51:34,237] 52 - INFO - Training cluster 1 model...
+[2025-08-08 20:51:34,437] 52 - INFO - Training cluster 2 model...
+[2025-08-08 20:51:35,437] 96 - INFO - OOF R2: 0.9006, RMSE: 0.3153
