@@ -2,6 +2,7 @@ import os
 import sys
 import numpy as np
 import pandas as pd
+import matplotlib.pyplot as plt 
 from dataclasses import dataclass
 from sklearn.model_selection import KFold
 from sklearn.cluster import KMeans
@@ -27,8 +28,7 @@ class MODEL_TRAINER:
         try:
             logging.info("Model training initiated with clustering")
 
-            target_index = -1  # last column
-
+            target_index = -1  
             X_train = train_array[:, :target_index]
             y_train = train_array[:, target_index]
 
@@ -36,13 +36,10 @@ class MODEL_TRAINER:
             y_test = test_array[:, target_index]
 
 
-
-            # Fit KMeans on target
             kmeans = KMeans(n_clusters=10, random_state=42)
             train_clusters = kmeans.fit_predict(y_train.reshape(-1, 1))
             test_clusters = kmeans.predict(y_test.reshape(-1, 1))
 
-            # Save kmeans model
             save_obj(self.model_trainer_config.kmeans_path, kmeans)
 
             models = {}
@@ -79,45 +76,37 @@ class MODEL_TRAINER:
                     )
                     model.fit(X_tr, y_tr)
 
-                    # Validation predictions
+
                     cluster_oof[val_idx] = model.predict(X_val)
-                    # Test predictions averaged
+
                     cluster_test_pred += model.predict(X_test_cluster) / kf.n_splits
 
-                # Store predictions
                 oof_pred[cluster_indices] = cluster_oof
                 test_pred[test_cluster_indices] = cluster_test_pred
 
-                # Save last model per cluster
                 models[cluster] = model
 
             import matplotlib.pyplot as plt
 
-            # Train Evaluation
             r2 = r2_score(y_train, oof_pred)
             rmse = np.sqrt(mean_squared_error(y_train, oof_pred))
             logging.info(f"OOF R2: {r2:.4f}, RMSE: {rmse:.4f}")
 
-            # Test Evaluation
+
             test_r2 = r2_score(y_test, test_pred)
             test_rmse = np.sqrt(mean_squared_error(y_test, test_pred))
             logging.info(f"TEST R2: {test_r2:.4f}, RMSE: {test_rmse:.4f}")
 
-            # Save models
             save_obj(self.model_trainer_config.model_path, models)
 
-            # Plot predicted vs actual
-            plt.figure(figsize=(12, 5))
 
-            # --- Train plot
+            plt.figure(figsize=(12, 5))
             plt.subplot(1, 2, 1)
             plt.scatter(y_train, oof_pred, alpha=0.5, edgecolor='k')
             plt.plot([y_train.min(), y_train.max()], [y_train.min(), y_train.max()], 'r--')
             plt.title(f"Train: R2={r2:.2f}, RMSE={rmse:.0f}")
             plt.xlabel("Actual Salary")
             plt.ylabel("Predicted Salary")
-
-            # --- Test plot
             plt.subplot(1, 2, 2)
             plt.scatter(y_test, test_pred, alpha=0.5, edgecolor='k')
             plt.plot([y_test.min(), y_test.max()], [y_test.min(), y_test.max()], 'r--')
@@ -135,14 +124,7 @@ class MODEL_TRAINER:
             print("Y_test stats → min:", y_test.min(), "max:", y_test.max())
 
 
-            # Final return
             return oof_pred, test_pred, r2, rmse, test_r2, test_rmse
-
-
-
-
-
-
 
         except Exception as e:
             raise CustomException(e, sys)

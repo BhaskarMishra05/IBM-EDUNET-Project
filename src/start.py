@@ -22,6 +22,6 @@ except Exception as e:
 
 try:
     trainer = MODEL_TRAINER()
-    oof, test_pred, R2_score, RMSE, test_R2, test_RMSE= trainer.model_trainer_initiator(train_array= train_arr, test_array= test_arr)
+    y_true, oof, y_pred = trainer.model_trainer_initiator(train_array= train_arr, test_array= test_arr)
 except Exception as e:
     raise CustomException(e,sys)
