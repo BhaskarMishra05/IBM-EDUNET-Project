@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 @dataclass
 class DATA_INGESTION_CONFIG:
-    raw_csv_path: str = os.path.join('artifacts','raw.csv')
+    raw_csv_path: str = os.path.join('artifacts','raw_salary.csv')
     train_csv_path: str = os.path.join('artifacts','train.csv')
     test_csv_path: str = os.path.join('artifacts','test.csv')
 

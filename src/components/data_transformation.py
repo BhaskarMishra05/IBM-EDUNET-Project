@@ -21,30 +21,10 @@ class DATA_TRANSFORMATION:
 
     def feature_engineering(self, df):
         try:
-            df['exchange_rate']=  (df['salary']/df['salary_in_usd']).round(2)
-            df['experience_level'] = df['experience_level'].map({'EN':0,
-                                                                'MI':1,
-                                                                'SE':2,
-                                                                'EX':3})
-            df['employment_type'] = df['employment_type'].map({'FL':0,
-                                                                'PT':1,
-                                                                'CT':2,
-                                                                'FT':3})
-            df['company_size'] = df['company_size'].map({'S':0,
-                                                        'M':1,
-                                                        'L':2})
-            outlier_comps = ['salary_in_usd', 'employment_type']
-            for i in outlier_comps:
-                Q1=df[i].quantile(0.25)
-                Q3=df[i].quantile(0.75)
-                IQR=Q3-Q1
-                lower_bound= Q1 - 1.5 * IQR
-                upper_bound= Q3 + 1.5 * IQR
-                df=df[(df[i] >= lower_bound) & (df[i] <= upper_bound)]
+            missing_col = ['workclass', 'occupation', 'native-country']
+            for col in missing_col:
+                df[col] = df[col].replace('?', 'unknown')
 
-            df['is_location_same']= (df['employee_residence']== df['company_location']).astype(int)
-            df = df.drop('salary', axis=1)
-            df = df[[col for col in df.columns if col != 'salary_in_usd'] + ['salary_in_usd']]
             return df
         except Exception as e:
             raise CustomException (e, sys)
@@ -56,8 +36,8 @@ class DATA_TRANSFORMATION:
 
             numerical_columns = df.select_dtypes(include=['number']).columns.tolist()
             categorical_columns = df.select_dtypes(include=['object']).columns.tolist()
-            if 'salary_in_usd' in numerical_columns:
-                numerical_columns.remove('salary_in_usd')
+            if 'income' in numerical_columns:
+                numerical_columns.remove('income')
 
             numerical_pipeline= Pipeline([('imputer', SimpleImputer(strategy='median')),
                                         ('scaler', StandardScaler())])
@@ -80,10 +60,10 @@ class DATA_TRANSFORMATION:
         train_feature_engg = self.feature_engineering(train_raw)
         test_feature_engg = self.feature_engineering(test_raw)
 
-        train_feature = train_feature_engg.drop(columns=['salary_in_usd'], axis= 1)
-        train_target = train_feature_engg['salary_in_usd']
-        test_feature = test_feature_engg.drop(columns=['salary_in_usd'], axis= 1)
-        test_target = test_feature_engg['salary_in_usd']
+        train_feature = train_feature_engg.drop(columns=['income'], axis= 1)
+        train_target = train_feature_engg['income']
+        test_feature = test_feature_engg.drop(columns=['income'], axis= 1)
+        test_target = test_feature_engg['income']
 
         preprocessing_obj = self.preprocessing(train_feature)
 
