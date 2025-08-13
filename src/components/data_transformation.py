@@ -21,7 +21,7 @@ class DATA_TRANSFORMATION:
 
     def feature_engineering(self, df):
         try:
-            missing_col = ['workclass', 'occupation', 'native-country']
+            missing_col = ['workclass', 'occupation', 'native_country']
             for col in missing_col:
                 df[col] = df[col].replace('?', 'unknown')
 
