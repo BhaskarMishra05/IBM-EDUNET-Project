@@ -6,3 +6,4 @@ ipykernel
 scikit-learn
 lightgbm
 flask
+gunicorn
