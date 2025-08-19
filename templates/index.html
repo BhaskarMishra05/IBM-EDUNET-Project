@@ -2,417 +2,881 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Income Predictor</title>
+  <title>Income Predictor - AI Portfolio Project</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
   <style>
     :root{
-      --glass: rgba(255,255,255,0.08);
-      --glow1: #00ffe0;
-      --glow2: #6aa0ff;
-      --bp: #ff6b6b;
-      --fg: #eaf6ff;
-      --bg1: #0f2027; --bg2:#203a43; --bg3:#2c5364;
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --primary-dark: #1d4ed8;
+      --accent: #06b6d4;
+      --accent-light: #0891b2;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-tertiary: #f1f5f9;
+      --text-primary: #1e293b;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --border-light: #f1f5f9;
+      --shadow: rgba(15, 23, 42, 0.08);
+      --shadow-lg: rgba(15, 23, 42, 0.15);
     }
-    * { box-sizing: border-box; margin:0; padding:0; }
-    html, body { height:100%; overflow:hidden; }
+    
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
+    
+    html { scroll-behavior: smooth; }
+    
     body {
-      font-family: 'Inter', system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color: var(--fg);
-      background: radial-gradient(1200px 800px at 20% 10%, #0b1a20 0%, transparent 60%),
-                  linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      line-height: 1.6;
+      color: var(--text-primary);
+      background: var(--bg-primary);
     }
 
-    /* Canvas background */
-    #nn-canvas {
-      position: fixed; inset: 0;
-      width: 100vw; height: 100vh;
-      display:block;
-      filter: drop-shadow(0 0 20px rgba(0,0,0,0.5));
+    /* Navigation */
+    .nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border-light);
+      transition: all 0.3s ease;
     }
 
-    /* Overlay UI */
-    .overlay {
-      position: fixed; inset: 0;
-      display: grid;
-      place-items: center;
-      pointer-events: none; /* let mouse pass through except buttons */
+    .nav-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 70px;
     }
-    .card {
-      pointer-events: auto;
-      background: var(--glass);
-      backdrop-filter: blur(14px) saturate(140%);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 22px;
-      padding: clamp(1.5rem, 2vw + 1rem, 3rem);
-      width: min(92vw, 720px);
-      box-shadow: 0 20px 60px rgba(0,0,0,0.45), inset 0 0 60px rgba(255,255,255,0.04);
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-weight: 500;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    .nav-links a:hover {
+      color: var(--primary);
+    }
+
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: var(--primary);
+      transition: width 0.3s ease;
+    }
+
+    .nav-links a:hover::after {
+      width: 100%;
+    }
+
+    /* Hero Section */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
       position: relative;
       overflow: hidden;
-      isolation: isolate;
-    }
-    .card::before{
-      content:"";
-      position:absolute; inset:-1px;
-      background:
-        radial-gradient(800px 200px at 0% 0%, rgba(106,160,255,0.15), transparent 60%),
-        radial-gradient(500px 300px at 100% 100%, rgba(0,255,224,0.12), transparent 60%);
-      z-index:-1;
-      pointer-events:none;
-    }
-    h1 {
-      font-size: clamp(1.9rem, 1.2rem + 2vw, 3rem);
-      font-weight: 900;
-      letter-spacing: -0.02em;
-      line-height: 1.1;
-      margin-bottom: .5rem;
-      background: linear-gradient(90deg, #eaf6ff, #b7d7ff);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
-    p.sub {
-      color: #cfe7ff;
-      opacity:.9;
-      margin-bottom: 1.25rem;
     }
 
-    .cta-row{
-      display:flex; gap: .75rem; flex-wrap:wrap; align-items:center;
-      margin-top: .75rem;
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(135deg, transparent 0%, var(--bg-tertiary) 50%, transparent 100%);
+      opacity: 0.5;
     }
-    .btn {
-      appearance: none; border: 0; cursor: pointer;
-      border-radius: 999px;
-      padding: .9rem 1.35rem;
-      font-weight: 700;
-      letter-spacing: .2px;
-      background: linear-gradient(135deg, var(--glow1), var(--glow2));
-      color: #06121a;
-      box-shadow:
-          0 14px 30px rgba(0,255,224,0.20),
-          0 4px 10px rgba(106,160,255,0.25),
-          inset 0 0 0 1px rgba(255,255,255,0.15);
-      transform: translateZ(0);
-      transition: transform .15s ease, filter .2s ease, box-shadow .2s ease;
-      text-decoration: none;
-      pointer-events:auto;
-    }
-    .btn:hover { transform: translateY(-2px); filter: brightness(1.05); }
-    .btn:active { transform: translateY(0); }
 
-    .pill {
-      display:inline-flex; align-items:center; gap:.5rem;
-      background: rgba(255,255,255,0.06);
-      border:1px solid rgba(255,255,255,0.12);
-      color: #e9f5ff;
-      padding: .55rem .9rem;
-      border-radius: 999px;
+    .hero-container {
+      max-width: 1200px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+    }
+
+    .hero-content {
+      padding: 2rem 0;
+    }
+
+    .status-badge {
+      display: inline-flex; 
+      align-items: center; 
+      gap: 0.5rem;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
       font-weight: 600;
-      pointer-events: none;
+      font-size: 0.875rem;
+      margin-bottom: 2rem;
     }
 
-    /* Tiny legend */
-    .legend {
-      display:flex; gap:.75rem; flex-wrap:wrap; margin-top: .75rem;
-      font-size: .85rem; color:#dbeeff;
-      opacity:.9;
+    .pulse-dot {
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      animation: pulse 2s infinite;
     }
-    .dot { width:.75rem; height:.75rem; border-radius:50%; display:inline-block; vertical-align:middle; margin-right:.35rem; }
-    .dot-fwd { background: var(--glow1); box-shadow: 0 0 12px var(--glow1); }
-    .dot-bwd { background: var(--bp); box-shadow: 0 0 12px var(--bp); }
-    .dot-w   { background: var(--glow2); box-shadow: 0 0 12px var(--glow2); }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.7; transform: scale(1.1); }
+    }
+
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 1.5rem;
+      color: var(--text-primary);
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: 2.5rem;
+      line-height: 1.7;
+      max-width: 500px;
+    }
+
+    .cta-section {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      font-weight: 600;
+      font-size: 1rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px var(--shadow);
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px var(--shadow-lg);
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 1rem 2rem;
+      background: transparent;
+      color: var(--text-secondary);
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+      background: var(--bg-secondary);
+    }
+
+    /* Hero Visual */
+    .hero-visual {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 2rem;
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .feature-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 12px var(--shadow);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px var(--shadow-lg);
+    }
+
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1rem;
+      color: white;
+      font-size: 1.5rem;
+    }
+
+    .feature-title {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+
+    .feature-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    /* Stats Section */
+    .stats-section {
+      padding: 5rem 2rem;
+      background: var(--bg-secondary);
+    }
+
+    .stats-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .stats-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+
+    .stats-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: 3rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .stat-card {
+      background: white;
+      padding: 2.5rem;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 12px var(--shadow);
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px var(--shadow-lg);
+    }
+
+    .stat-value {
+      font-size: 3rem;
+      font-weight: 800;
+      color: var(--primary);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      color: var(--text-secondary);
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .stat-description {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin-top: 0.5rem;
+    }
+
+    /* Tech Stack Section */
+    .tech-section {
+      padding: 5rem 2rem;
+      background: white;
+    }
+
+    .tech-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .tech-title {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+      color: var(--text-primary);
+    }
+
+    .tech-subtitle {
+      font-size: 1.25rem;
+      color: var(--text-secondary);
+      margin-bottom: 3rem;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .tech-card {
+      background: var(--bg-secondary);
+      padding: 2.5rem;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      text-align: left;
+      transition: all 0.3s ease;
+    }
+
+    .tech-card:hover {
+      background: white;
+      transform: translateY(-4px);
+      box-shadow: 0 8px 24px var(--shadow-lg);
+    }
+
+    .tech-card-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .tech-card-icon {
+      width: 50px;
+      height: 50px;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 1.25rem;
+    }
+
+    .tech-card-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .tech-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .tech-list li {
+      padding: 0.5rem 0;
+      color: var(--text-secondary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .tech-list li::before {
+      content: '✓';
+      color: var(--accent);
+      font-weight: bold;
+    }
+
+    /* CTA Section */
+    .final-cta {
+      padding: 5rem 2rem;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: white;
+      text-align: center;
+    }
+
+    .final-cta-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+
+    .final-cta h2 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 1rem;
+    }
+
+    .final-cta p {
+      font-size: 1.25rem;
+      margin-bottom: 2.5rem;
+      opacity: 0.9;
+    }
+
+    .btn-white {
+      background: white;
+      color: var(--primary);
+      padding: 1.25rem 2.5rem;
+      font-size: 1.1rem;
+      font-weight: 700;
+      border: none;
+      border-radius: 12px;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .btn-white:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+
+    /* Footer */
+    .footer {
+      background: var(--bg-secondary);
+      padding: 3rem 2rem;
+      text-align: center;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 2rem;
+    }
+
+    .footer-text {
+      color: var(--text-muted);
+    }
+
+    .footer-links {
+      display: flex;
+      gap: 2rem;
+      list-style: none;
+    }
+
+    .footer-links a {
+      color: var(--text-secondary);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .footer-links a:hover {
+      color: var(--primary);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .nav-links { display: none; }
+      
+      .hero-container {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+      }
+      
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .cta-section {
+        justify-content: center;
+      }
+      
+      .stats-grid, .tech-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .footer-container {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .hero h1 {
+        font-size: 2rem;
+      }
+      
+      .stats-title, .tech-title, .final-cta h2 {
+        font-size: 2rem;
+      }
+    }
+
+    /* Animations */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-in-up {
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+
+    .delay-1 { animation-delay: 0.1s; }
+    .delay-2 { animation-delay: 0.2s; }
+    .delay-3 { animation-delay: 0.3s; }
+    .delay-4 { animation-delay: 0.4s; }
   </style>
 </head>
 <body>
-  <canvas id="nn-canvas"></canvas>
+  <!-- Navigation -->
+  <nav class="nav">
+    <div class="nav-container">
+      <a href="#" class="logo">
+        <i class="fas fa-brain"></i>
+        Income Predictor
+      </a>
+      <ul class="nav-links">
+        <li><a href="#demo">Demo</a></li>
+        <li><a href="#stats">Performance</a></li>
+        <li><a href="#tech">Technology</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
 
-  <div class="overlay">
-    <section class="card">
-      <span class="pill">Real-time Neural Net Simulation</span>
-      <h1>Income Predictor</h1>
-      <p class="sub">A living, breathing network animates behind this glass — forward activations, backprop pulses, and weight updates in motion.</p>
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-container">
+      <div class="hero-content">
+        <div class="status-badge">
+          <div class="pulse-dot"></div>
+          Portfolio Project
+        </div>
+        
+        <h1>AI-Powered Income Prediction</h1>
+        
+        <p class="hero-subtitle">
+          A machine learning portfolio project that predicts income levels using demographic data. 
+          Built with Python, scikit-learn, and modern web technologies.
+        </p>
 
-      <div class="legend">
-        <span><span class="dot dot-fwd"></span>Forward activation</span>
-        <span><span class="dot dot-bwd"></span>Backprop signal</span>
-        <span><span class="dot dot-w"></span>Weight update</span>
+        <div class="cta-section">
+          <a href="{{ url_for('predict_datapoints') }}" class="btn-primary">
+            <i class="fas fa-rocket"></i>
+            Try the Demo
+          </a>
+        </div>
       </div>
 
-      <div class="cta-row">
-        <a class="btn" href="{{ url_for('predict_datapoints') }}">🚀 Start Prediction</a>
+      <div class="hero-visual">
+        <div class="feature-grid">
+          <div class="feature-card fade-in-up delay-1">
+            <div class="feature-icon">
+              <i class="fas fa-brain"></i>
+            </div>
+            <div class="feature-title">Machine Learning</div>
+            <div class="feature-desc">Advanced algorithms for accurate predictions</div>
+          </div>
+          <div class="feature-card fade-in-up delay-2">
+            <div class="feature-icon">
+              <i class="fas fa-chart-bar"></i>
+            </div>
+            <div class="feature-title">Data Analysis</div>
+            <div class="feature-desc">14 demographic features analyzed</div>
+          </div>
+          <div class="feature-card fade-in-up delay-3">
+            <div class="feature-icon">
+              <i class="fas fa-clock"></i>
+            </div>
+            <div class="feature-title">Real-time</div>
+            <div class="feature-desc">Instant prediction results</div>
+          </div>
+          <div class="feature-card fade-in-up delay-4">
+            <div class="feature-icon">
+              <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="feature-title">Privacy First</div>
+            <div class="feature-desc">No data stored or shared</div>
+          </div>
+        </div>
       </div>
-    </section>
-  </div>
+    </div>
+  </section>
+
+  <!-- Stats Section -->
+  <section class="stats-section" id="stats">
+    <div class="stats-container">
+      <h2 class="stats-title">Model Performance</h2>
+      <p class="stats-subtitle">
+        Trained on the Adult Census Income dataset with comprehensive validation and testing.
+      </p>
+      
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-value">90%</span>
+          <div class="stat-label">Accuracy</div>
+          <div class="stat-description">Model accuracy on test dataset</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">14</span>
+          <div class="stat-label">Features</div>
+          <div class="stat-description">Demographic and professional attributes</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">48K</span>
+          <div class="stat-label">Training Data</div>
+          <div class="stat-description">Records used for model training</div>
+        </div>
+        <div class="stat-card">
+          <span class="stat-value">< 1s</span>
+          <div class="stat-label">Response Time</div>
+          <div class="stat-description">Average prediction latency</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Tech Stack Section -->
+  <section class="tech-section" id="tech">
+    <div class="tech-container">
+      <h2 class="tech-title">Technology Stack</h2>
+      <p class="tech-subtitle">
+        Built with modern technologies and best practices for machine learning and web development.
+      </p>
+      
+      <div class="tech-grid">
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-card-icon">
+              <i class="fab fa-python"></i>
+            </div>
+            <div class="tech-card-title">Machine Learning</div>
+          </div>
+          <ul class="tech-list">
+            <li>Python 3.9+</li>
+            <li>Scikit-learn</li>
+            <li>Pandas & NumPy</li>
+            <li>LightGBM</li>
+            <li>Feature Engineering</li>
+          </ul>
+        </div>
+        
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-card-icon">
+              <i class="fas fa-globe"></i>
+            </div>
+            <div class="tech-card-title">Web Development</div>
+          </div>
+          <ul class="tech-list">
+            <li>Flask Framework</li>
+            <li>HTML5 & CSS3</li>
+            <li>JavaScript ES6+</li>
+            <li>Responsive Design</li>
+            <li>Python Backend</li>
+          </ul>
+        </div>
+        
+        <div class="tech-card">
+          <div class="tech-card-header">
+            <div class="tech-card-icon">
+              <i class="fas fa-database"></i>
+            </div>
+            <div class="tech-card-title">Data Processing</div>
+          </div>
+          <ul class="tech-list">
+            <li>Adult Census Dataset</li>
+            <li>Data Preprocessing</li>
+            <li>Feature Scaling</li>
+            <li>Model Persistence</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="final-cta">
+    <div class="final-cta-container">
+      <h2>Ready to Experience AI Prediction?</h2>
+      <p>
+        Test the income predictor with your own data and see machine learning in action. 
+        This demo showcases the power of AI for data-driven insights.
+      </p>
+      <a href="{{ url_for('predict_datapoints') }}" class="btn-white">
+        <i class="fas fa-play"></i>
+        Start Demo Now
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <ul class="footer-links">
+        <li><a href="https://github.com/BhaskarMishra05" target="_blank">GitHub</a></li>
+      </ul>
+    </div>
+  </footer>
 
   <script>
-    (() => {
-      const canvas = document.getElementById('nn-canvas');
-      const ctx = canvas.getContext('2d');
-      let W, H, DPR = Math.min(window.devicePixelRatio || 1, 2);
-      function resize() {
-        W = canvas.clientWidth = window.innerWidth;
-        H = canvas.clientHeight = window.innerHeight;
-        canvas.width = W * DPR;
-        canvas.height = H * DPR;
-        ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    // Navbar scroll effect
+    window.addEventListener('scroll', () => {
+      const nav = document.querySelector('.nav');
+      if (window.scrollY > 50) {
+        nav.style.boxShadow = '0 2px 20px rgba(15, 23, 42, 0.08)';
+      } else {
+        nav.style.boxShadow = 'none';
       }
-      window.addEventListener('resize', resize, { passive: true });
-      resize();
+    });
 
-      // ------- Neural layout (perspective layers) -------
-      const layers = [10, 18, 12, 8]; // nodes per layer (tweakable)
-      const depth = layers.length;
-      const marginX = 160;
-      const marginY = 80;
-
-      function lerp(a,b,t){return a + (b-a)*t;}
-      function clamp(x,a,b){return Math.max(a,Math.min(b,x));}
-      function rand(a,b){return a + Math.random()*(b-a);}
-
-      // Perspective params
-      const cam = { z: 900, fov: 700, wobble: 0 };
-      const grid = {
-        left: marginX, right: () => W - marginX,
-        top:  marginY, bottom: () => H - marginY
-      };
-
-      const nodes = []; // {x,y,z, a, noise, vx, vy}
-      const edges = []; // {i,j, w, pulse, dir}
-      const layerIndex = []; // boundary index per layer
-
-      // Build nodes with gentle noise
-      let idx = 0, xStep = (grid.right() - grid.left) / (layers.length - 1);
-      for (let L = 0; L < layers.length; L++){
-        const count = layers[L];
-        const x = grid.left + L * xStep;
-        const lyTop = grid.top;
-        const lyBottom = grid.bottom();
-        for (let n = 0; n < count; n++){
-          const y = lerp(lyTop, lyBottom, (n + 1) / (count + 1));
-          nodes.push({
-            x, y, z: L * 200, a: 0,
-            noise: rand(0, 1), vx: 0, vy: 0
-          });
-          idx++;
+    // Smooth scrolling for navigation
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth' });
         }
-        layerIndex.push(idx);
-      }
+      });
+    });
 
-      // Build edges between adjacent layers
-      function idxOf(L, n){ return (L === 0 ? 0 : layerIndex[L-1]) + n; }
-      for (let L = 0; L < layers.length - 1; L++){
-        for (let i = 0; i < layers[L]; i++){
-          for (let j = 0; j < layers[L+1]; j++){
-            const a = idxOf(L, i), b = idxOf(L+1, j);
-            edges.push({
-              i: a, j: b,
-              w: rand(0.3, 1.2), // weight magnitude
-              pulse: 0,          // 0..1 pulse along edge
-              dir: 1             // +1 forward, -1 backward
-            });
-          }
+    // Intersection Observer for animations
+    const observerOptions = {
+      threshold: 0.1,
+      rootMargin: '0px 0px -50px 0px'
+    };
+
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('fade-in-up');
         }
-      }
+      });
+    }, observerOptions);
 
-      // Sim phases: forward -> settle -> backprop -> settle
-      const phases = [
-        { name: 'forward', dur: 2.2, color: '#00ffe0' },
-        { name: 'settle',  dur: 0.6, color: '#74c0fc' },
-        { name: 'backprop',dur: 2.0, color: '#ff6b6b' },
-        { name: 'settle',  dur: 0.6, color: '#74c0fc' }
-      ];
-      let phaseIdx = 0, phaseT = 0;
+    // Observe elements for animation
+    document.querySelectorAll('.stat-card, .tech-card').forEach(el => {
+      observer.observe(el);
+    });
 
-      // Cursor light parallax
-      const cursor = {x: W*0.5, y:H*0.5};
-      window.addEventListener('pointermove', e => {
-        cursor.x = e.clientX; cursor.y = e.clientY;
-      }, { passive:true });
+    // Button interaction effects
+    document.querySelectorAll('.btn-primary, .btn-white').forEach(btn => {
+      btn.addEventListener('mouseenter', () => {
+        btn.style.transform = 'translateY(-2px) scale(1.02)';
+      });
+      btn.addEventListener('mouseleave', () => {
+        btn.style.transform = 'translateY(0) scale(1)';
+      });
+    });
 
-      // Project 3D-ish to 2D (z by layer)
-      function project(p){
-        const z = cam.z - p.z - cam.wobble;
-        const scale = cam.fov / z;
-        return { x: (p.x - W/2)*scale + W/2, y: (p.y - H/2)*scale + H/2, s: scale };
-      }
-
-      // Activate a layer’s nodes
-      function activateLayer(L, amt){
-        const start = (L === 0 ? 0 : layerIndex[L-1]);
-        const end = layerIndex[L];
-        for (let i = start; i < end; i++){
-          const n = nodes[i];
-          n.a = Math.max(n.a, amt);
-        }
-      }
-
-      // Advance pulses along edges
-      function pulseEdges(dir, dt){
-        for (const e of edges){
-          e.dir = dir;
-          e.pulse += dt / rand(0.8,1.3); // add variety
-          if (e.pulse > 1) e.pulse = 0;
-        }
-      }
-
-      // Weight adaptation wiggle
-      function adaptWeights(dt){
-        for (const e of edges){
-          const delta = (Math.random() - 0.5) * 0.02 * dt * 60;
-          e.w = clamp(e.w + delta, 0.25, 1.5);
-        }
-      }
-
-      // Gentle node breathing + parallax to cursor
-      function moveNodes(t){
-        const cx = cursor.x, cy = cursor.y;
-        for (const n of nodes){
-          const pr = project(n); // for parallax
-          const dx = (cx - pr.x) * 0.0008;
-          const dy = (cy - pr.y) * 0.0008;
-          n.vx += dx; n.vy += dy;
-          n.vx *= 0.94; n.vy *= 0.94;
-          n.x += n.vx;  n.y += n.vy;
-
-          // breathing noise
-          n.y += Math.sin(t*0.8 + n.noise*6.28) * 0.05;
-          n.x += Math.cos(t*0.6 + n.noise*4.12) * 0.05;
-        }
-      }
-
-      // Render
-      function draw(t, dt){
-        // vignette background pass
-        ctx.clearRect(0,0,W,H);
-        const g = ctx.createLinearGradient(0,0, W,H);
-        g.addColorStop(0, 'rgba(255,255,255,0.04)');
-        g.addColorStop(1, 'rgba(255,255,255,0.00)');
-        ctx.fillStyle = g;
-        ctx.fillRect(0,0,W,H);
-
-        // connections (draw back to front for depth)
-        ctx.lineCap = 'round';
-        for (const e of edges){
-          const a = nodes[e.i], b = nodes[e.j];
-          const ap = project(a), bp = project(b);
-          const w = e.w * 1.2 * (ap.s + bp.s);
-
-          // base wire
-          ctx.globalAlpha = 0.18;
-          ctx.strokeStyle = '#bfe5ff';
-          ctx.lineWidth = w;
-          ctx.beginPath();
-          ctx.moveTo(ap.x, ap.y);
-          ctx.lineTo(bp.x, bp.y);
-          ctx.stroke();
-
-          // glow wire
-          ctx.globalAlpha = 0.10;
-          ctx.lineWidth = w * 2.4;
-          ctx.stroke();
-
-          // animated pulse
-          const p = e.pulse;
-          const px = ap.x + (bp.x - ap.x) * p;
-          const py = ap.y + (bp.y - ap.y) * p;
-          const grad = ctx.createRadialGradient(px, py, 0, px, py, 60);
-          const color = (phases[phaseIdx].name === 'backprop') ? getCSS('--bp') : getCSS('--glow1');
-          grad.addColorStop(0, hexToRgba(color, 0.9));
-          grad.addColorStop(1, hexToRgba(color, 0.0));
-          ctx.globalAlpha = 0.9;
-          ctx.fillStyle = grad;
-          ctx.beginPath();
-          ctx.arc(px, py, 60, 0, Math.PI*2);
-          ctx.fill();
-        }
-
-        // nodes
-        for (const n of nodes){
-          const p = project(n);
-          const r = 5 + 8 * p.s;
-          const aura = r * 4;
-          const aGlow = n.a * 0.9;
-
-          // outer aura
-          const rg = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, aura);
-          rg.addColorStop(0, hexToRgba('#bfe5ff', 0.16 + aGlow*0.3));
-          rg.addColorStop(1, 'rgba(255,255,255,0)');
-          ctx.globalAlpha = 1;
-          ctx.fillStyle = rg;
-          ctx.beginPath(); ctx.arc(p.x, p.y, aura, 0, Math.PI*2); ctx.fill();
-
-          // core
-          ctx.fillStyle = '#eaf6ff';
-          ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI*2); ctx.fill();
-
-          // slight highlight
-          ctx.globalAlpha = 0.5 + 0.5 * n.a;
-          ctx.fillStyle = '#ffffff';
-          ctx.beginPath(); ctx.arc(p.x - r*0.3, p.y - r*0.3, r*0.35, 0, Math.PI*2); ctx.fill();
-
-          // decay activation
-          n.a *= 0.90;
-        }
-      }
-
-      function getCSS(varName){
-        return getComputedStyle(document.documentElement).getPropertyValue(varName).trim();
-      }
-      function hexToRgba(hex, a){
-        let h = hex.replace('#','');
-        if (h.length === 3) h = h.split('').map(c => c+c).join('');
-        const n = parseInt(h,16);
-        const r = (n>>16)&255, g=(n>>8)&255, b=n&255;
-        return `rgba(${r},${g},${b},${a})`;
-      }
-
-      // Animation loop
-      let last = performance.now();
-      function loop(now){
-        const dt = Math.min(0.05, (now - last)/1000); last = now;
-        const t = now/1000;
-
-        // phase timing
-        phaseT += dt;
-        const ph = phases[phaseIdx];
-        if (phaseT >= ph.dur){
-          phaseT = 0; phaseIdx = (phaseIdx + 1) % phases.length;
-        }
-
-        // network dynamics
-        if (ph.name === 'forward'){
-          // sweep activations left->right
-          const total = layers.length;
-          const prog = phaseT / ph.dur;
-          const activeLayer = Math.floor(prog * total);
-          activateLayer(activeLayer, 1.0);
-          pulseEdges(+1, dt);
-          adaptWeights(dt * 0.5);
-        } else if (ph.name === 'backprop'){
-          // sweep right->left
-          const total = layers.length;
-          const prog = phaseT / ph.dur;
-          const activeLayer = total - 1 - Math.floor(prog * total);
-          activateLayer(activeLayer, 0.9);
-          pulseEdges(-1, dt);
-          adaptWeights(dt * 0.7);
+    // Counter animation for stats
+    function animateCounter(element, target, duration = 2000) {
+      let start = 0;
+      const increment = target / (duration / 16);
+      const timer = setInterval(() => {
+        start += increment;
+        if (start >= target) {
+          element.textContent = target;
+          clearInterval(timer);
         } else {
-          // settle
-          pulseEdges(+1, dt * 0.5);
-          adaptWeights(dt * 0.2);
+          element.textContent = Math.floor(start);
         }
+      }, 16);
+    }
 
-        // subtle camera wobble
-        cam.wobble = Math.sin(t*0.8) * 40 + Math.cos(t*0.6) * 25;
+    // Animate stats when they come into view
+    const statsObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const value = entry.target.textContent.replace('%', '').replace('K', '000').replace('<', '').replace('s', '');
+          if (!isNaN(value) && value !== '') {
+            animateCounter(entry.target, parseInt(value));
+          }
+          statsObserver.unobserve(entry.target);
+        }
+      });
+    });
 
-        moveNodes(t);
-        draw(t, dt);
-        requestAnimationFrame(loop);
+    // Only animate numeric stats
+    document.querySelectorAll('.stat-value').forEach(stat => {
+      const text = stat.textContent;
+      if (text.match(/^\d+/)) {
+        statsObserver.observe(stat);
       }
-      requestAnimationFrame(loop);
-    })();
+    });
   </script>
 </body>
 </html>
