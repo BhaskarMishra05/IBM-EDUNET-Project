@@ -183,6 +183,27 @@
             box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
         }
 
+        .sample-btn {
+            padding: 1rem 2rem;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 2rem auto 0;
+        }
+
+        .sample-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.3);
+        }
+
         /* Results Section */
         .results-section {
             margin-top: 2rem;
@@ -317,6 +338,10 @@
             .nav-links {
                 display: none;
             }
+
+            .stats-grid {
+                grid-template-columns: 1fr !important;
+            }
         }
 
         /* Tooltip */
@@ -425,6 +450,10 @@
                     <div style="color: #666;">Project Type</div>
                 </div>
             </div>
+            <button id="fillSampleBtn" class="sample-btn">
+                <i class="fas fa-magic"></i>
+                Fill Sample Data
+            </button>
         </section>
 
         <section class="form-section" id="predictor">
@@ -722,6 +751,62 @@
     </footer>
 
     <script>
+        // Sample data based on dataset statistics
+        const sampleData = {
+            age: [23, 25, 28, 30, 31, 33, 35, 36, 38, 40, 42, 45, 48, 50, 52, 55, 58, 60],
+            gender: ['Male', 'Female'],
+            race: ['White', 'Black', 'Asian-Pac-Islander', 'Amer-Indian-Eskimo', 'Other'],
+            native_country: ['United-States', 'Mexico', 'Philippines', 'Germany', 'Canada', 'Puerto-Rico', 'El-Salvador', 'India', 'Cuba', 'England'],
+            education: ['HS-grad', 'Some-college', 'Bachelors', 'Masters', 'Assoc-voc', '11th', 'Assoc-acdm', '10th', '7th-8th', 'Prof-school', '9th', '12th', 'Doctorate', '5th-6th', '1st-4th', 'Preschool'],
+            educational_num: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16],
+            workclass: ['Private', 'Self-emp-not-inc', 'Local-gov', 'State-gov', 'Self-emp-inc', 'Federal-gov', 'Without-pay'],
+            occupation: ['Prof-specialty', 'Craft-repair', 'Exec-managerial', 'Adm-clerical', 'Sales', 'Other-service', 'Machine-op-inspct', 'Transport-moving', 'Handlers-cleaners', 'Farming-fishing', 'Tech-support', 'Protective-serv', 'Priv-house-serv', 'Armed-Forces'],
+            hours_per_week: [20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70],
+            marital_status: ['Married-civ-spouse', 'Never-married', 'Divorced', 'Separated', 'Widowed', 'Married-spouse-absent', 'Married-AF-spouse'],
+            relationship: ['Husband', 'Not-in-family', 'Own-child', 'Unmarried', 'Wife', 'Other-relative'],
+            fnlwgt: [100000, 150000, 200000, 250000, 300000, 350000, 400000],
+            capital_gain: [0, 5000, 7298, 7688, 15024, 99999],
+            capital_loss: [0, 1887, 1902, 1977, 2415]
+        };
+
+        // Function to get random item from array
+        function getRandomItem(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        // Fill sample data button handler
+        document.getElementById('fillSampleBtn').addEventListener('click', function() {
+            const form = document.getElementById('predictionForm');
+            
+            // Fill all form fields with random sample data
+            form.querySelector('[name="age"]').value = getRandomItem(sampleData.age);
+            form.querySelector('[name="gender"]').value = getRandomItem(sampleData.gender);
+            form.querySelector('[name="race"]').value = getRandomItem(sampleData.race);
+            form.querySelector('[name="native_country"]').value = getRandomItem(sampleData.native_country);
+            form.querySelector('[name="education"]').value = getRandomItem(sampleData.education);
+            form.querySelector('[name="educational_num"]').value = getRandomItem(sampleData.educational_num);
+            form.querySelector('[name="workclass"]').value = getRandomItem(sampleData.workclass);
+            form.querySelector('[name="occupation"]').value = getRandomItem(sampleData.occupation);
+            form.querySelector('[name="hours_per_week"]').value = getRandomItem(sampleData.hours_per_week);
+            form.querySelector('[name="marital_status"]').value = getRandomItem(sampleData.marital_status);
+            form.querySelector('[name="relationship"]').value = getRandomItem(sampleData.relationship);
+            form.querySelector('[name="fnlwgt"]').value = getRandomItem(sampleData.fnlwgt);
+            form.querySelector('[name="capital_gain"]').value = getRandomItem(sampleData.capital_gain);
+            form.querySelector('[name="capital_loss"]').value = getRandomItem(sampleData.capital_loss);
+            
+            // Add visual feedback
+            this.innerHTML = '<i class="fas fa-check"></i> Sample Data Filled!';
+            this.style.background = 'linear-gradient(135deg, #10b981, #059669)';
+            
+            setTimeout(() => {
+                this.innerHTML = '<i class="fas fa-magic"></i> Fill Sample Data';
+                this.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
+            }, 2000);
+            
+            // Scroll to form
+            document.getElementById('predictor').scrollIntoView({ behavior: 'smooth' });
+        });
+
         // Form submission handling
         document.getElementById('predictionForm').addEventListener('submit', function(e) {
             e.preventDefault();
